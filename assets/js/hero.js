@@ -13,7 +13,7 @@
   let nodes = [], raf = null, running = true;
   const mouse = { x: -9999, y: -9999, active: false };
 
-  const COLORS = ['34,211,238', '59,130,246', '139,92,246'];
+  const COLORS = ['8,145,178', '37,99,235', '124,58,237'];
 
   function resize() {
     const r = canvas.getBoundingClientRect();
@@ -69,7 +69,7 @@
         const d2 = dx * dx + dy * dy;
         if (d2 < 30000) {
           const a = (1 - d2 / 30000) * 0.8;
-          ctx.strokeStyle = `rgba(94,234,255,${a})`;
+          ctx.strokeStyle = `rgba(8,145,178,${a})`;
           ctx.lineWidth = 0.9;
           ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
         }

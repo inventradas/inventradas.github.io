@@ -6,29 +6,29 @@
 
 /* ---------- 1. Design Tokens ---------- */
 :root {
-  /* Core palette */
-  --bg:            #070b16;   /* page background (near-black navy) */
-  --bg-2:          #0a1020;   /* alt section bg */
-  --surface:       #0e1525;   /* card surface */
-  --surface-2:     #131c30;   /* elevated surface */
-  --line:          rgba(148, 173, 210, 0.12);
-  --line-strong:   rgba(148, 173, 210, 0.22);
+  /* Core palette — BRIGHT theme */
+  --bg:            #f4f7fc;   /* page background (light) */
+  --bg-2:          #e9eff7;   /* alt section bg */
+  --surface:       #ffffff;   /* card surface */
+  --surface-2:     #eef3fb;   /* elevated surface */
+  --line:          rgba(22, 45, 92, 0.10);
+  --line-strong:   rgba(22, 45, 92, 0.18);
 
   /* Accents */
-  --cyan:          #22d3ee;
-  --cyan-bright:   #5eeaff;
-  --blue:          #3b82f6;
-  --blue-deep:     #2563eb;
-  --violet:        #8b5cf6;
-  --amber:         #f59e0b;   /* signal / sparing highlight */
-  --grad: linear-gradient(135deg, #22d3ee 0%, #3b82f6 55%, #8b5cf6 100%);
-  --grad-soft: linear-gradient(135deg, rgba(34,211,238,.16), rgba(59,130,246,.16));
+  --cyan:          #0891b2;
+  --cyan-bright:   #06b6d4;
+  --blue:          #2563eb;
+  --blue-deep:     #1d4ed8;
+  --violet:        #7c3aed;
+  --amber:         #d97706;   /* signal / sparing highlight */
+  --grad: linear-gradient(135deg, #06b6d4 0%, #3b82f6 55%, #8b5cf6 100%);
+  --grad-soft: linear-gradient(135deg, rgba(8,145,178,.12), rgba(59,130,246,.12));
 
   /* Text */
-  --text:          #e8eefb;
-  --text-soft:     #aeb9d0;
-  --text-muted:    #7e8aa6;
-  --text-faint:    #5d6987;
+  --text:          #0f1b2d;
+  --text-soft:     #3b4a61;
+  --text-muted:    #5f6c82;
+  --text-faint:    #8a96ab;
 
   /* Typography */
   --font-display: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
@@ -55,9 +55,9 @@
   --section-y: clamp(4.5rem, 3rem + 6vw, 9rem);
 
   /* Effects */
-  --shadow-1: 0 10px 30px -12px rgba(0,0,0,.55);
-  --shadow-2: 0 30px 60px -20px rgba(0,0,0,.65);
-  --glow-cyan: 0 0 40px -6px rgba(34,211,238,.45);
+  --shadow-1: 0 10px 30px -14px rgba(30,55,100,.22);
+  --shadow-2: 0 30px 60px -24px rgba(30,55,100,.28);
+  --glow-cyan: 0 0 36px -8px rgba(8,145,178,.30);
   --ease: cubic-bezier(.2,.7,.2,1);
   --ease-out: cubic-bezier(.16,1,.3,1);
 
@@ -609,3 +609,62 @@ section { position: relative; }
 @keyframes pl-cube{0%,100%{transform:translateY(0) rotate(-5deg) scale(1)}50%{transform:translateY(-12px) rotate(5deg) scale(1.05)}}
 @keyframes pl-load{0%{left:-45%}100%{left:100%}}
 @keyframes pl-mesh{0%{transform:scale(1) translate(0,0) rotate(0deg)}100%{transform:scale(1.25) translate(3%,-3%) rotate(8deg)}}
+/* ============================================================
+   22. BRIGHT THEME ADJUSTMENTS (overrides dark-built rules)
+   ============================================================ */
+/* headings & emphasis text that were white */
+h1, h2, h3, h4 { color: var(--text); }
+.brand .name .row b { color: var(--text); }
+.nav-links a:hover, .nav-links a.active { color: var(--text); }
+.btn { color: var(--text); }
+.btn-primary { color: #04121b; }
+.acc-head { color: var(--text); }
+.quote .who .nm { color: var(--text); }
+.info-tile .v { color: var(--text); }
+.hero-meta .item .n { color: var(--text); }
+.quote blockquote { color: var(--text); }
+.pl-word b { color: var(--text); }
+.input, .textarea, select.input { color: var(--text); background: #fff; }
+.input:focus, .textarea:focus, select.input:focus { background: #fff; }
+.newsletter input { background: #fff; color: var(--text); }
+
+/* gradient text — darker so it reads on white */
+.grad-text { background: linear-gradient(120deg,#0891b2 0%,#2563eb 50%,#7c3aed 100%); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; }
+.grad-text-anim { background: linear-gradient(120deg,#0891b2,#06b6d4,#7c3aed,#2563eb,#0891b2); background-size:280% auto; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; }
+
+/* glass surfaces -> clean white cards with soft shadow */
+.card { background: var(--surface); box-shadow: var(--shadow-1); }
+.card:hover { box-shadow: var(--shadow-2); }
+.btn-ghost { background: #fff; color: var(--text); }
+.btn-ghost:hover { background: rgba(8,145,178,.08); border-color: var(--cyan); }
+.stat { background: var(--surface); box-shadow: var(--shadow-1); }
+.accordion { background: var(--surface); }
+.info-tile { background: var(--surface); }
+.chip { background: rgba(22,45,92,.05); color: var(--text-soft); }
+
+/* header / nav / mobile menu */
+.site-header.scrolled { background: rgba(255,255,255,.82); border-bottom-color: var(--line); }
+.nav-toggle { background: #fff; }
+.nav-toggle span { background: var(--text); }
+.mobile-menu { background: rgba(255,255,255,.97); border-left-color: var(--line); }
+.mobile-menu a:hover, .mobile-menu a.active { color: var(--text); }
+
+/* badges, hero, footer, cta */
+.badge-cat { background: rgba(255,255,255,.85); color: var(--blue-deep); }
+.hero::after { background: radial-gradient(ellipse 60% 50% at 50% 35%, transparent 45%, rgba(244,247,252,.55) 100%), linear-gradient(180deg, transparent 62%, var(--bg) 100%); }
+.glow-orb { opacity: .30; }
+.cta-band { background: radial-gradient(circle at 20% 20%, rgba(8,145,178,.13), transparent 50%), radial-gradient(circle at 80% 80%, rgba(124,58,237,.13), transparent 50%), var(--surface); }
+.site-footer { background: linear-gradient(180deg, var(--bg), #e6edf7); }
+
+/* scrollbar + selection */
+::-webkit-scrollbar-track { background: var(--bg-2); }
+::-webkit-scrollbar-thumb { background: #c3d2e8; border: 2px solid var(--bg-2); }
+::-webkit-scrollbar-thumb:hover { background: var(--blue); }
+::selection { background: rgba(8,145,178,.22); color: var(--text); }
+
+/* preloader -> light */
+.preloader { background: var(--bg-2); }
+.preloader::before { opacity:.8; }
+.pl-bar { background: rgba(22,45,92,.10); }
+
+/* code blocks stay dark (readable) on purpose */
