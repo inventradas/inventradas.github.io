@@ -51,13 +51,20 @@
   const initials = (n) => String(n||'').trim().split(/\s+/).slice(0,2).map(w => w[0] ? w[0].toUpperCase() : '').join('');
 
   /* ---------- builders ---------- */
-  const projectCard = (p) => `
+  const isLocalVid = (u) => /\.(mp4|webm|ogg)(\?|$)/i.test(u || '');
+  const projectCard = (p) => {
+    const media = (p.video && isLocalVid(p.video))
+      ? `<video class="thumb-video" autoplay muted loop playsinline poster="${esc(p.image||'')}"><source src="${esc(p.video)}"></video>`
+      : (p.image ? `<img src="${esc(p.image)}" alt="${esc(p.title)}" loading="lazy">` : `<div class="ph">${shapeSvg(p.shape)}</div>`);
+    const play = p.video ? `<button class="playbtn" data-video="${esc(p.video)}" aria-label="Play video"><i></i></button>` : '';
+    return `
     <article class="card project glow" data-cat="${esc(p.category)}">
-      <div class="thumb"><span class="cat badge-cat">${esc(p.badge)}</span>${p.image ? `<img src="${esc(p.image)}" alt="${esc(p.title)}" loading="lazy">` : `<div class="ph">${shapeSvg(p.shape)}</div>`}</div>
+      <div class="thumb"><span class="cat badge-cat">${esc(p.badge)}</span>${media}${play}</div>
       <div class="body"><h3>${esc(p.title)}</h3><p>${esc(p.description)}</p>
         <div class="tag-row">${(p.tags || []).map(chip).join('')}</div>
         <div class="result">${CHECK_SM} ${esc(p.result)}</div></div>
     </article>`;
+  };
 
   const serviceCard = (s) => `
     <article class="card glow">
@@ -186,6 +193,18 @@
       if (lead && s.hero_lead) lead.textContent = s.hero_lead;
       const tw = $('[data-typewriter]', hero);
       if (tw && Array.isArray(s.hero_typewriter) && s.hero_typewriter.length) typewriter(tw, s.hero_typewriter);
+      if (s.hero_video) {
+        hero.classList.add('hero--video');
+        if (!hero.querySelector('.hero-bg-video')) {
+          const v = document.createElement('video');
+          v.className = 'hero-bg-video'; v.autoplay = true; v.loop = true; v.muted = true; v.playsInline = true;
+          v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
+          if (s.hero_video_poster) v.poster = s.hero_video_poster;
+          v.src = s.hero_video;
+          hero.insertBefore(v, hero.firstChild);
+          v.play().catch(() => {});
+        }
+      }
     }
   };
 
@@ -224,6 +243,37 @@
         <div class="cta-actions"><a href="contact.html" class="btn btn-primary">Get in touch ${ARROW}</a><a href="blog.html" class="btn btn-ghost">← All insights</a></div>
       </div></div></section>`;
   };
+
+  /* ---------- video lightbox ---------- */
+  const videoUrl = (u) => {
+    if (!u) return null;
+    const yt = u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|v\/))([\w-]{6,})/);
+    if (yt) return { type:'iframe', src:`https://www.youtube.com/embed/${yt[1]}?autoplay=1&rel=0` };
+    const vm = u.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+    if (vm) return { type:'iframe', src:`https://player.vimeo.com/video/${vm[1]}?autoplay=1` };
+    return { type:'video', src:u };
+  };
+  const ensureLightbox = () => {
+    let lb = document.getElementById('vlightbox');
+    if (!lb) {
+      lb = document.createElement('div'); lb.id = 'vlightbox'; lb.className = 'vlightbox';
+      lb.innerHTML = '<div class="vbox-wrap"><button class="vclose" aria-label="Close">✕</button><div class="vbox"></div></div>';
+      document.body.appendChild(lb);
+      const close = () => { lb.classList.remove('open'); $('.vbox', lb).innerHTML = ''; };
+      lb.addEventListener('click', e => { if (e.target === lb || e.target.closest('.vclose')) close(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+    }
+    return lb;
+  };
+  const openVideo = (u) => {
+    const v = videoUrl(u); if (!v) return;
+    const lb = ensureLightbox();
+    $('.vbox', lb).innerHTML = v.type === 'iframe'
+      ? `<iframe src="${v.src}" allow="autoplay; fullscreen; encrypted-media" allowfullscreen></iframe>`
+      : `<video src="${esc(v.src)}" controls autoplay playsinline></video>`;
+    lb.classList.add('open');
+  };
+  document.addEventListener('click', e => { const b = e.target.closest('.playbtn'); if (b) { e.preventDefault(); openVideo(b.dataset.video); } });
 
   async function init() {
     try { const s = await getJSON('content/settings.json'); applySettings(s); renderStats(s); } catch (e) {}

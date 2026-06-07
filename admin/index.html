@@ -140,9 +140,9 @@
 
     <!-- MEDIA -->
     <section class="panel" id="panel-media">
-      <div class="panel-head"><div><h2>Media — upload images</h2><p class="muted">Upload a logo or photos, then copy the path to use anywhere (e.g. a project's Image field).</p></div></div>
+      <div class="panel-head"><div><h2>Media — upload images &amp; videos</h2><p class="muted">Upload a logo, photo or short clip, then copy the path to use anywhere (project image, project video, or hero background).</p></div></div>
       <div class="editor-card">
-        <div class="field"><label>Choose an image</label><input type="file" id="mediaFile" accept="image/*" class="input"></div>
+        <div class="field"><label>Choose an image or short video</label><input type="file" id="mediaFile" accept="image/*,video/*" class="input"></div>
         <button class="btn btn-primary" id="mediaBtn" onclick="doMediaUpload()">Upload</button>
         <div id="mediaResult" style="margin-top:1rem"></div>
       </div>
@@ -265,6 +265,9 @@ function renderSettings(){
     </div>
     <div class="field"><label>Hero lead paragraph</label><textarea class="textarea" id="s_hero_lead" style="min-height:80px">${esc(s.hero_lead)}</textarea></div>
     <div class="field"><label>Rotating typewriter phrases (one per line)</label><textarea class="textarea" id="s_hero_tw" style="min-height:120px">${esc(tw)}</textarea></div>
+    <div class="field"><label>Hero background video (optional — a short muted clip plays behind the hero; leave blank for the animated particles)</label>
+      <div style="display:flex;gap:.5rem"><input class="input" id="s_hero_video" value="${esc(s.hero_video||'')}" placeholder="assets/video/hero.mp4" style="flex:1"><button type="button" class="btn btn-ghost btn-sm" onclick="pickHeroVideo()">Upload…</button></div>
+      <p class="muted" style="font-size:.78rem;margin-top:.4rem">Keep uploads small (≈ under 15 MB). For bigger videos, host on YouTube/Vimeo and use it as a project demo instead.</p></div>
     <h3 style="margin:1.7rem 0 .9rem">Stats</h3>
     <div id="statsWrap">${stats}</div>`;
 }
@@ -282,6 +285,7 @@ async function saveSettings(){
     hero_badge:g('s_hero_badge'), hero_title_before:g('s_hero_before'), hero_title_accent:g('s_hero_accent'),
     hero_title_after:g('s_hero_after'), hero_lead:$('#s_hero_lead').value.trim(),
     hero_typewriter: $('#s_hero_tw').value.split('\n').map(x=>x.trim()).filter(Boolean),
+    hero_video: $('#s_hero_video').value.trim(),
     stats
   };
   await withSave('#saveSettings', ()=>saveFile('settings', obj, 'Update home & contact (admin)'), 'Saved ✓');
@@ -303,6 +307,7 @@ function projectCardForm(p, i){
     </div>
     <div class="field" style="margin-top:.9rem"><label>Description</label><textarea class="textarea" data-f="description" style="min-height:70px">${esc(p.description)}</textarea></div>
     <div class="field"><label>Image (optional — shows instead of the icon)</label><div style="display:flex;gap:.5rem"><input class="input" data-f="image" value="${esc(p.image||'')}" placeholder="assets/img/projects/my-project.jpg" style="flex:1"><button type="button" class="btn btn-ghost btn-sm" onclick="pickImage(this)">Upload…</button></div></div>
+    <div class="field"><label>Demo video (optional — YouTube/Vimeo link, or upload a clip → shows a ▶ play button)</label><div style="display:flex;gap:.5rem"><input class="input" data-f="video" value="${esc(p.video||'')}" placeholder="https://youtu.be/…  or  assets/video/demo.mp4" style="flex:1"><button type="button" class="btn btn-ghost btn-sm" onclick="pickImage(this,'video','video/*')">Upload…</button></div></div>
     <div class="grid2" style="margin-top:.4rem">
       <div class="field"><label>Tags (comma-separated)</label><input class="input" data-f="tags" value="${esc((p.tags||[]).join(', '))}"></div>
       <div class="field"><label>Result line</label><input class="input" data-f="result" value="${esc(p.result)}"></div>
@@ -315,7 +320,7 @@ function collectProjects(){
   return Array.from(document.querySelectorAll('#projectsList [data-proj]')).map(card=>{
     const g = f => { const el = card.querySelector(`[data-f="${f}"]`); return el ? el.value.trim() : ''; };
     return { title:g('title'), category:g('category'), badge:g('badge'), shape:g('shape'),
-      description:g('description'), image:g('image'), tags:g('tags').split(',').map(t=>t.trim()).filter(Boolean), result:g('result') };
+      description:g('description'), image:g('image'), video:g('video'), tags:g('tags').split(',').map(t=>t.trim()).filter(Boolean), result:g('result') };
   });
 }
 async function saveProjects(){
@@ -436,16 +441,24 @@ async function saveFaq(){ const items=collectFaq(); await withSave('#saveFaq',()
 /* ---------- IMAGE UPLOAD (commits to repo via GitHub API) ---------- */
 async function uploadImage(file){
   const name = Date.now() + '-' + file.name.replace(/[^a-zA-Z0-9.\-_]/g,'-').toLowerCase();
-  const path = 'assets/img/uploads/' + name;
+  const isVid = /^video\//.test(file.type) || /\.(mp4|webm|ogg|mov)$/i.test(file.name);
+  const path = (isVid ? 'assets/video/' : 'assets/img/uploads/') + name;
   const b64 = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(',')[1]); r.onerror=rej; r.readAsDataURL(file); });
   const resp = await ghFetch(`/repos/${CONFIG.repo}/contents/${path}`, { method:'PUT', body: JSON.stringify({ message:'Upload '+name+' (admin)', content:b64, branch:CONFIG.branch }) });
   if(!resp.ok){ const e=await resp.json().catch(()=>({})); throw new Error(e.message||'upload failed'); }
   return path;
 }
-function pickImage(btn){
-  const inp = btn.parentElement.querySelector('[data-f="image"]');
-  const f = document.createElement('input'); f.type='file'; f.accept='image/*';
-  f.onchange = async ()=>{ if(!f.files[0]) return; const lbl=btn.textContent; btn.disabled=true; btn.textContent='…'; try{ inp.value = await uploadImage(f.files[0]); toast('Image uploaded ✓','ok'); }catch(e){ toast('Upload failed: '+e.message,'err'); } finally{ btn.disabled=false; btn.textContent=lbl; } };
+function pickImage(btn, field, accept){
+  field = field || 'image'; accept = accept || 'image/*';
+  const inp = btn.parentElement.querySelector(`[data-f="${field}"]`);
+  const f = document.createElement('input'); f.type='file'; f.accept=accept;
+  f.onchange = async ()=>{ if(!f.files[0]) return; const lbl=btn.textContent; btn.disabled=true; btn.textContent='…'; try{ inp.value = await uploadImage(f.files[0]); toast('Uploaded ✓','ok'); }catch(e){ toast('Upload failed: '+e.message,'err'); } finally{ btn.disabled=false; btn.textContent=lbl; } };
+  f.click();
+}
+function pickHeroVideo(){
+  const inp = document.getElementById('s_hero_video');
+  const f = document.createElement('input'); f.type='file'; f.accept='video/*';
+  f.onchange = async ()=>{ if(!f.files[0]) return; toast('Uploading video…','info'); try{ inp.value = await uploadImage(f.files[0]); toast('Video uploaded — click Save to apply.','ok'); }catch(e){ toast('Upload failed: '+e.message,'err'); } };
   f.click();
 }
 function pickLogo(){
