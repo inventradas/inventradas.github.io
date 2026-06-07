@@ -40,7 +40,7 @@
   /* ---- builders ---- */
   const projectCard = (p) => `
     <article class="card project glow" data-cat="${esc(p.category)}">
-      <div class="thumb"><span class="cat badge-cat">${esc(p.badge)}</span><div class="ph">${shapeSvg(p.shape)}</div></div>
+      <div class="thumb"><span class="cat badge-cat">${esc(p.badge)}</span>${p.image ? `<img src="${esc(p.image)}" alt="${esc(p.title)}" loading="lazy">` : `<div class="ph">${shapeSvg(p.shape)}</div>`}</div>
       <div class="body"><h3>${esc(p.title)}</h3><p>${esc(p.description)}</p>
         <div class="tag-row">${(p.tags || []).map(chip).join('')}</div>
         <div class="result">${CHECK} ${esc(p.result)}</div></div>
