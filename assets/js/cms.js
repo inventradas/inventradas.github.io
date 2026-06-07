@@ -157,6 +157,13 @@
 
   /* ---------- settings + hero ---------- */
   const applySettings = (s) => {
+    // Logo image (one source → header, footer, loading screen, favicon)
+    if (s.logo) {
+      const lim = (cls, rad) => `<img class="${cls}" src="${esc(s.logo)}" alt="INVENTRA" style="border-radius:${rad};object-fit:cover">`;
+      $$('svg.mark').forEach(el => { el.outerHTML = lim('mark', '24%'); });
+      $$('svg.pl-logo').forEach(el => { el.outerHTML = lim('pl-logo', '18%'); });
+      const fav = document.querySelector('link[rel="icon"]'); if (fav) fav.href = s.logo;
+    }
     $$('a[href^="mailto:"]').forEach(a => { a.href = 'mailto:' + s.email; });
     $$('a[href^="tel:"]').forEach(a => { a.href = 'tel:' + (s.phone_href || s.phone || '').replace(/\s/g, ''); });
     $$('[data-cms="email"]').forEach(e => e.textContent = s.email);

@@ -236,7 +236,15 @@ function renderSettings(){
       <div class="field" style="grid-column:1/-1"><label>Label</label><input class="input statl" value="${esc(st.label)}"></div>
     </div>`).join('');
   $('#settingsForm').innerHTML = `
-    <h3 style="margin-bottom:.9rem">Contact &amp; social</h3>
+    <h3 style="margin-bottom:.9rem">Logo</h3>
+    <div class="field"><label>Logo image — used in the header, footer &amp; loading screen (one place changes all)</label>
+      <div style="display:flex;gap:.5rem;align-items:center">
+        <input class="input" id="s_logo" value="${esc(s.logo||'')}" placeholder="assets/img/logo.jpg" style="flex:1">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="pickLogo()">Upload…</button>
+      </div>
+      ${s.logo?`<img src="../${esc(s.logo)}" alt="logo preview" style="height:56px;width:56px;object-fit:cover;border-radius:13px;margin-top:.7rem;border:1px solid var(--line)">`:''}
+    </div>
+    <h3 style="margin:1.5rem 0 .9rem">Contact &amp; social</h3>
     <div class="grid2">
       ${field('Company name','s_company',s.company)}
       ${field('Email','s_email',s.email)}
@@ -268,6 +276,7 @@ async function saveSettings(){
     label: row.querySelector('.statl').value.trim()
   }));
   const obj = {
+    logo:g('s_logo'),
     company:g('s_company'), email:g('s_email'), phone:g('s_phone'), phone_href:g('s_phone_href'),
     location:g('s_location'), response_time:g('s_response_time'), linkedin:g('s_linkedin'), github:g('s_github'), x:g('s_x'),
     hero_badge:g('s_hero_badge'), hero_title_before:g('s_hero_before'), hero_title_accent:g('s_hero_accent'),
@@ -437,6 +446,12 @@ function pickImage(btn){
   const inp = btn.parentElement.querySelector('[data-f="image"]');
   const f = document.createElement('input'); f.type='file'; f.accept='image/*';
   f.onchange = async ()=>{ if(!f.files[0]) return; const lbl=btn.textContent; btn.disabled=true; btn.textContent='…'; try{ inp.value = await uploadImage(f.files[0]); toast('Image uploaded ✓','ok'); }catch(e){ toast('Upload failed: '+e.message,'err'); } finally{ btn.disabled=false; btn.textContent=lbl; } };
+  f.click();
+}
+function pickLogo(){
+  const inp = document.getElementById('s_logo');
+  const f = document.createElement('input'); f.type='file'; f.accept='image/*';
+  f.onchange = async ()=>{ if(!f.files[0]) return; toast('Uploading logo…','info'); try{ inp.value = await uploadImage(f.files[0]); toast('Logo uploaded — click Save to apply it everywhere.','ok'); }catch(e){ toast('Upload failed: '+e.message,'err'); } };
   f.click();
 }
 async function doMediaUpload(){
