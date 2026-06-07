@@ -8,7 +8,11 @@
   <meta name="theme-color" content="#070b16">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="site.webmanifest">
+  <link rel="canonical" href="https://inventradas.github.io/">
   <meta name="author" content="INVENTRA Design & Automation Solutions">
+  <meta name="keywords" content="INVENTRA, INVENTRA Solutions, INVENTRADAS, INVENTRA Design & Automation Solutions, industrial automation, PLC HMI, embedded systems, SolidWorks, IoT engineering">
+  <!-- Add this once you verify in Google Search Console (replace the content value): -->
+  <!-- <meta name="google-site-verification" content="YOUR_VERIFICATION_CODE"> -->
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="INVENTRA — Design & Automation Solutions">
@@ -24,13 +28,32 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "INVENTRA Design & Automation Solutions",
-    "description": "Industrial automation, embedded systems, PLC/HMI and IoT engineering consultancy.",
-    "url": "https://inventradas.github.io/",
-    "logo": "https://inventradas.github.io/favicon.svg",
-    "areaServed": "Worldwide",
-    "knowsAbout": ["Industrial Automation","PLC Programming","HMI Design","Embedded Systems","IoT","SCADA","Control Systems"]
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://inventradas.github.io/#org",
+        "name": "INVENTRA Design & Automation Solutions",
+        "alternateName": ["INVENTRA", "INVENTRA Solutions", "INVENTRADAS", "INVENTRA DAS"],
+        "legalName": "INVENTRA Design & Automation Solutions",
+        "url": "https://inventradas.github.io/",
+        "logo": "https://inventradas.github.io/favicon.svg",
+        "image": "https://inventradas.github.io/assets/img/og.svg",
+        "description": "INVENTRA (INVENTRA Solutions / INVENTRADAS) is a design & automation engineering studio — industrial automation, PLC/HMI, embedded systems, SolidWorks mechanical design, control systems and IoT.",
+        "slogan": "We design, automate & engineer the systems that move industry.",
+        "email": "hello@inventra.dev",
+        "areaServed": "Worldwide",
+        "knowsAbout": ["Industrial Automation", "PLC Programming", "HMI Design", "Embedded Systems", "SolidWorks Mechanical Design", "IoT", "SCADA", "Control Systems"],
+        "sameAs": ["https://github.com/inventradas"]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://inventradas.github.io/#website",
+        "name": "INVENTRA Design & Automation Solutions",
+        "alternateName": ["INVENTRA", "INVENTRA Solutions", "INVENTRADAS"],
+        "url": "https://inventradas.github.io/",
+        "publisher": { "@id": "https://inventradas.github.io/#org" }
+      }
+    ]
   }
   </script>
 </head>

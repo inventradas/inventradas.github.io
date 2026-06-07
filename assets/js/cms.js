@@ -96,6 +96,14 @@
     const p = posts.find(x => x.slug === slug);
     if (!p) { pa.innerHTML = '<section class="section center" style="padding-top:8rem"><div class="container"><h1>Post not found</h1><p class="lead mt-2 muted">That article doesn\'t exist or was moved.</p><a href="blog.html" class="btn btn-ghost mt-3">← All insights</a></div></section>'; return; }
     document.title = p.title + ' | INVENTRA Insights';
+    // SEO: per-post canonical + description
+    const head = document.head;
+    let can = head.querySelector('link[rel="canonical"]');
+    if (!can) { can = document.createElement('link'); can.rel = 'canonical'; head.appendChild(can); }
+    can.href = 'https://inventradas.github.io/post.html?slug=' + encodeURIComponent(p.slug);
+    let mdesc = head.querySelector('meta[name="description"]');
+    if (!mdesc) { mdesc = document.createElement('meta'); mdesc.name = 'description'; head.appendChild(mdesc); }
+    mdesc.content = (p.excerpt || '').slice(0, 160);
     const md = Array.isArray(p.body) ? p.body.join('\n') : (p.body || '');
     const html = (window.marked ? window.marked.parse(md) : esc(md));
     pa.innerHTML = `
