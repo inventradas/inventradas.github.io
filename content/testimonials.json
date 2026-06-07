@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "name": "John Schäfer",
+      "role": "Eng. Manager · TechCorp Industries",
+      "quote": "INVENTRA delivered our robotic assembly line beyond spec — 99%+ accuracy and rock-solid uptime. Senior, responsive and detail-obsessed throughout.",
+      "rating": 5
+    },
+    {
+      "name": "Sarah Janssen",
+      "role": "CTO · GreenEnergy Solutions",
+      "quote": "The IoT monitoring platform cut our energy costs 35% in the first quarter. The dashboards are exactly what our operators needed — clear and reliable.",
+      "rating": 5
+    },
+    {
+      "name": "Michael Chen",
+      "role": "Ops Director · AutomateX",
+      "quote": "Our predictive-maintenance rollout has saved us millions in avoided downtime. INVENTRA's firmware and edge analytics just work, at fleet scale.",
+      "rating": 5
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "items": [
+    { "q": "What size projects do you take on?", "a": "Everything from a single firmware module or machine to full production-line automation. If it involves hardware, firmware, controls or connectivity, we can help — and we'll tell you honestly if we're not the right fit." },
+    { "q": "How do you price engagements?", "a": "After a short discovery call we provide a fixed-price proposal for well-scoped work, or a transparent time-and-materials rate for R&D and ongoing support. No surprises." },
+    { "q": "Do you work remotely or on-site?", "a": "Both. Most design, firmware and PLC development happens remotely, with on-site commissioning, testing and training as needed anywhere worldwide." },
+    { "q": "Do you provide ongoing support?", "a": "Yes — optional support packages cover troubleshooting, remote monitoring, firmware updates and continuous improvement after go-live." },
+    { "q": "Who owns the IP and source code?", "a": "You do. On delivery you receive full source, CAD, documentation and a clean handover. Your product is yours." }
+  ]
+}

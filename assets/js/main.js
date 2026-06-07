@@ -112,24 +112,11 @@
     counters.forEach(el => cio.observe(el));
   }
 
-  /* ---- Typewriter ---- */
+  /* ---- Typewriter: static fallback only (cms.js drives the animation from editable settings) ---- */
   const tw = $('[data-typewriter]');
-  if (tw && !reduceMotion) {
-    const words = JSON.parse(tw.dataset.typewriter);
+  if (tw) {
     const out = $('.tw-text', tw) || tw;
-    let wi = 0, ci = 0, deleting = false;
-    const loop = () => {
-      const word = words[wi];
-      out.textContent = word.slice(0, ci);
-      if (!deleting && ci < word.length) { ci++; setTimeout(loop, 75); }
-      else if (!deleting && ci === word.length) { deleting = true; setTimeout(loop, 1600); }
-      else if (deleting && ci > 0) { ci--; setTimeout(loop, 38); }
-      else { deleting = false; wi = (wi + 1) % words.length; setTimeout(loop, 280); }
-    };
-    loop();
-  } else if (tw) {
-    const out = $('.tw-text', tw) || tw;
-    out.textContent = JSON.parse(tw.dataset.typewriter)[0];
+    try { out.textContent = JSON.parse(tw.dataset.typewriter)[0] || ''; } catch (e) {}
   }
 
   /* ---- Card sheen follows cursor ---- */

@@ -87,9 +87,13 @@
 
   <div class="wrap">
     <div class="tabs">
-      <button class="tab active" data-tab="settings" onclick="switchTab('settings')">Business details</button>
+      <button class="tab active" data-tab="settings" onclick="switchTab('settings')">Home &amp; contact</button>
+      <button class="tab" data-tab="services" onclick="switchTab('services')">Services</button>
       <button class="tab" data-tab="projects" onclick="switchTab('projects')">Projects</button>
+      <button class="tab" data-tab="testimonials" onclick="switchTab('testimonials')">Testimonials</button>
       <button class="tab" data-tab="blog" onclick="switchTab('blog')">Blog</button>
+      <button class="tab" data-tab="faq" onclick="switchTab('faq')">FAQ</button>
+      <button class="tab" data-tab="media" onclick="switchTab('media')">Media</button>
     </div>
 
     <!-- SETTINGS -->
@@ -112,6 +116,37 @@
       <div id="blogList"><p class="muted">Loading…</p></div>
       <div class="savebar"><button class="btn btn-primary" id="saveBlog" onclick="saveBlog()">Save changes</button></div>
     </section>
+
+    <!-- SERVICES -->
+    <section class="panel" id="panel-services">
+      <div class="panel-head"><div><h2>Services</h2><p class="muted">The services shown on the home + services pages.</p></div><button class="btn btn-ghost btn-sm" onclick="addService()">+ Add service</button></div>
+      <div id="servicesList"><p class="muted">Loading…</p></div>
+      <div class="savebar"><button class="btn btn-primary" id="saveServices" onclick="saveServices()">Save changes</button></div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="panel" id="panel-testimonials">
+      <div class="panel-head"><div><h2>Testimonials</h2><p class="muted">Client quotes on the home page.</p></div><button class="btn btn-ghost btn-sm" onclick="addTestimonial()">+ Add testimonial</button></div>
+      <div id="testimonialsList"><p class="muted">Loading…</p></div>
+      <div class="savebar"><button class="btn btn-primary" id="saveTestimonials" onclick="saveTestimonials()">Save changes</button></div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="panel" id="panel-faq">
+      <div class="panel-head"><div><h2>FAQ</h2><p class="muted">Questions on the home + services pages.</p></div><button class="btn btn-ghost btn-sm" onclick="addFaq()">+ Add question</button></div>
+      <div id="faqList"><p class="muted">Loading…</p></div>
+      <div class="savebar"><button class="btn btn-primary" id="saveFaq" onclick="saveFaq()">Save changes</button></div>
+    </section>
+
+    <!-- MEDIA -->
+    <section class="panel" id="panel-media">
+      <div class="panel-head"><div><h2>Media — upload images</h2><p class="muted">Upload a logo or photos, then copy the path to use anywhere (e.g. a project's Image field).</p></div></div>
+      <div class="editor-card">
+        <div class="field"><label>Choose an image</label><input type="file" id="mediaFile" accept="image/*" class="input"></div>
+        <button class="btn btn-primary" id="mediaBtn" onclick="doMediaUpload()">Upload</button>
+        <div id="mediaResult" style="margin-top:1rem"></div>
+      </div>
+    </section>
   </div>
 </div>
 
@@ -120,7 +155,7 @@
 <script>
 const API = 'https://api.github.com';
 const CONFIG = { token: null, repo: null, branch: 'main' };
-const FILES = { settings: 'content/settings.json', projects: 'content/projects.json', blog: 'content/blog.json' };
+const FILES = { settings: 'content/settings.json', projects: 'content/projects.json', blog: 'content/blog.json', services: 'content/services.json', testimonials: 'content/testimonials.json', faq: 'content/faq.json' };
 const SHA = {};      // current sha per file
 const DATA = {};     // loaded json per key
 
@@ -179,19 +214,29 @@ async function saveFile(key, obj, msg){
 }
 
 async function loadAll(){
-  try{
-    DATA.settings = await loadFile('settings'); renderSettings();
-    DATA.projects = (await loadFile('projects')).items || []; renderProjects();
-    DATA.blog = (await loadFile('blog')).posts || []; renderBlog();
-    toast('Loaded. Edit and Save — changes go live in ~1 min.', 'ok');
-  }catch(e){ toast('Could not load content: '+e.message, 'err'); }
+  const step = async (key, after) => { try { after(await loadFile(key)); } catch(e){ /* file may not exist yet — skip */ } };
+  await step('settings', d => { DATA.settings = d; renderSettings(); });
+  await step('services', d => { DATA.services = d.items || []; renderServices(); });
+  await step('projects', d => { DATA.projects = d.items || []; renderProjects(); });
+  await step('testimonials', d => { DATA.testimonials = d.items || []; renderTestimonials(); });
+  await step('blog', d => { DATA.blog = d.posts || []; renderBlog(); });
+  await step('faq', d => { DATA.faq = d.items || []; renderFaq(); });
+  toast('Loaded. Edit any tab and hit Save — changes go live in ~1 min.', 'ok');
 }
 
 /* ---------- SETTINGS ---------- */
 function field(label, id, val, ph=''){ return `<div class="field"><label>${label}</label><input class="input" id="${id}" value="${esc(val)}" placeholder="${ph}"></div>`; }
 function renderSettings(){
   const s = DATA.settings || {};
+  const tw = (s.hero_typewriter||[]).join('\n');
+  const stats = (s.stats||[]).map((st,i)=>`
+    <div class="grid2 statrow" style="gap:.6rem;margin-bottom:.4rem">
+      <div class="field"><label>Stat ${i+1} value</label><input class="input statv" value="${esc(st.value)}"></div>
+      <div class="field"><label>Suffix</label><input class="input statx" value="${esc(st.suffix||'')}"></div>
+      <div class="field" style="grid-column:1/-1"><label>Label</label><input class="input statl" value="${esc(st.label)}"></div>
+    </div>`).join('');
   $('#settingsForm').innerHTML = `
+    <h3 style="margin-bottom:.9rem">Contact &amp; social</h3>
     <div class="grid2">
       ${field('Company name','s_company',s.company)}
       ${field('Email','s_email',s.email)}
@@ -202,13 +247,35 @@ function renderSettings(){
       ${field('LinkedIn URL','s_linkedin',s.linkedin)}
       ${field('GitHub URL','s_github',s.github)}
       ${field('X / Twitter URL','s_x',s.x)}
-    </div>`;
+    </div>
+    <h3 style="margin:1.7rem 0 .9rem">Homepage hero</h3>
+    <div class="grid2">
+      ${field('Badge (top pill text)','s_hero_badge',s.hero_badge)}
+      ${field('Headline accent word (gradient)','s_hero_accent',s.hero_title_accent)}
+      ${field('Headline — text before accent','s_hero_before',s.hero_title_before)}
+      ${field('Headline — text after accent','s_hero_after',s.hero_title_after)}
+    </div>
+    <div class="field"><label>Hero lead paragraph</label><textarea class="textarea" id="s_hero_lead" style="min-height:80px">${esc(s.hero_lead)}</textarea></div>
+    <div class="field"><label>Rotating typewriter phrases (one per line)</label><textarea class="textarea" id="s_hero_tw" style="min-height:120px">${esc(tw)}</textarea></div>
+    <h3 style="margin:1.7rem 0 .9rem">Stats</h3>
+    <div id="statsWrap">${stats}</div>`;
 }
 async function saveSettings(){
   const g = id => $('#'+id).value.trim();
-  const obj = { company:g('s_company'), email:g('s_email'), phone:g('s_phone'), phone_href:g('s_phone_href'),
-    location:g('s_location'), response_time:g('s_response_time'), linkedin:g('s_linkedin'), github:g('s_github'), x:g('s_x') };
-  await withSave('#saveSettings', ()=>saveFile('settings', obj, 'Update business details (admin)'), 'Business details saved ✓');
+  const stats = Array.from(document.querySelectorAll('#statsWrap .statrow')).map(row=>({
+    value: row.querySelector('.statv').value.trim(),
+    suffix: row.querySelector('.statx').value.trim(),
+    label: row.querySelector('.statl').value.trim()
+  }));
+  const obj = {
+    company:g('s_company'), email:g('s_email'), phone:g('s_phone'), phone_href:g('s_phone_href'),
+    location:g('s_location'), response_time:g('s_response_time'), linkedin:g('s_linkedin'), github:g('s_github'), x:g('s_x'),
+    hero_badge:g('s_hero_badge'), hero_title_before:g('s_hero_before'), hero_title_accent:g('s_hero_accent'),
+    hero_title_after:g('s_hero_after'), hero_lead:$('#s_hero_lead').value.trim(),
+    hero_typewriter: $('#s_hero_tw').value.split('\n').map(x=>x.trim()).filter(Boolean),
+    stats
+  };
+  await withSave('#saveSettings', ()=>saveFile('settings', obj, 'Update home & contact (admin)'), 'Saved ✓');
   DATA.settings = obj;
 }
 
@@ -226,7 +293,7 @@ function projectCardForm(p, i){
       <div class="field"><label>Icon shape</label><select class="input" data-f="shape">${SHAPES.map(o=>`<option ${o===p.shape?'selected':''}>${o}</option>`).join('')}</select></div>
     </div>
     <div class="field" style="margin-top:.9rem"><label>Description</label><textarea class="textarea" data-f="description" style="min-height:70px">${esc(p.description)}</textarea></div>
-    <div class="field"><label>Image (optional — path or URL; shows instead of the icon)</label><input class="input" data-f="image" value="${esc(p.image||'')}" placeholder="assets/img/projects/my-project.jpg"></div>
+    <div class="field"><label>Image (optional — shows instead of the icon)</label><div style="display:flex;gap:.5rem"><input class="input" data-f="image" value="${esc(p.image||'')}" placeholder="assets/img/projects/my-project.jpg" style="flex:1"><button type="button" class="btn btn-ghost btn-sm" onclick="pickImage(this)">Upload…</button></div></div>
     <div class="grid2" style="margin-top:.4rem">
       <div class="field"><label>Tags (comma-separated)</label><input class="input" data-f="tags" value="${esc((p.tags||[]).join(', '))}"></div>
       <div class="field"><label>Result line</label><input class="input" data-f="result" value="${esc(p.result)}"></div>
@@ -292,6 +359,95 @@ async function withSave(btnSel, fn, okMsg){
 function switchTab(name){
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
   document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id==='panel-'+name));
+}
+
+/* ---------- SERVICES ---------- */
+const SVC_ICONS = ['gear','chip','broadcast','sliders','cube','shield'];
+function serviceForm(s,i){
+  return `<div class="editor-card" data-svc>
+    <div class="row-head"><span class="idx">SERVICE ${i+1}</span><button class="btn-danger" onclick="this.closest('[data-svc]').remove()">Remove</button></div>
+    <div class="grid2">
+      <div class="field"><label>Title</label><input class="input" data-f="title" value="${esc(s.title)}"></div>
+      <div class="field"><label>Icon</label><select class="input" data-f="icon">${SVC_ICONS.map(o=>`<option ${o===s.icon?'selected':''}>${o}</option>`).join('')}</select></div>
+    </div>
+    <div class="field" style="margin-top:.9rem"><label>Description</label><textarea class="textarea" data-f="description" style="min-height:70px">${esc(s.description)}</textarea></div>
+    <div class="field"><label>Feature bullets (one per line)</label><textarea class="textarea" data-f="features" style="min-height:80px">${esc((s.features||[]).join('\n'))}</textarea></div>
+  </div>`;
+}
+function renderServices(){ $('#servicesList').innerHTML = (DATA.services||[]).map(serviceForm).join('') || '<p class="muted">No services yet.</p>'; }
+function addService(){ DATA.services = collectServices(); DATA.services.push({title:'New service',icon:'gear',description:'',features:[]}); renderServices(); }
+function collectServices(){
+  return Array.from(document.querySelectorAll('#servicesList [data-svc]')).map(c=>{
+    const g=f=>{const e=c.querySelector(`[data-f="${f}"]`);return e?e.value:'';};
+    return { icon:g('icon'), title:g('title').trim(), description:g('description').trim(), features:g('features').split('\n').map(x=>x.trim()).filter(Boolean) };
+  });
+}
+async function saveServices(){ const items=collectServices(); await withSave('#saveServices',()=>saveFile('services',{items},'Update services (admin)'),'Services saved ✓'); DATA.services=items; }
+
+/* ---------- TESTIMONIALS ---------- */
+function testimonialForm(t,i){
+  return `<div class="editor-card" data-tst>
+    <div class="row-head"><span class="idx">TESTIMONIAL ${i+1}</span><button class="btn-danger" onclick="this.closest('[data-tst]').remove()">Remove</button></div>
+    <div class="grid2">
+      <div class="field"><label>Name</label><input class="input" data-f="name" value="${esc(t.name)}"></div>
+      <div class="field"><label>Role · Company</label><input class="input" data-f="role" value="${esc(t.role)}"></div>
+    </div>
+    <div class="field"><label>Stars</label><select class="input" data-f="rating">${[5,4,3,2,1].map(n=>`<option ${n===(t.rating||5)?'selected':''}>${n}</option>`).join('')}</select></div>
+    <div class="field"><label>Quote</label><textarea class="textarea" data-f="quote" style="min-height:90px">${esc(t.quote)}</textarea></div>
+  </div>`;
+}
+function renderTestimonials(){ $('#testimonialsList').innerHTML = (DATA.testimonials||[]).map(testimonialForm).join('') || '<p class="muted">No testimonials yet.</p>'; }
+function addTestimonial(){ DATA.testimonials=collectTestimonials(); DATA.testimonials.push({name:'New client',role:'Role · Company',quote:'',rating:5}); renderTestimonials(); }
+function collectTestimonials(){
+  return Array.from(document.querySelectorAll('#testimonialsList [data-tst]')).map(c=>{
+    const g=f=>{const e=c.querySelector(`[data-f="${f}"]`);return e?e.value:'';};
+    return { name:g('name').trim(), role:g('role').trim(), quote:g('quote').trim(), rating:parseInt(g('rating'),10)||5 };
+  });
+}
+async function saveTestimonials(){ const items=collectTestimonials(); await withSave('#saveTestimonials',()=>saveFile('testimonials',{items},'Update testimonials (admin)'),'Testimonials saved ✓'); DATA.testimonials=items; }
+
+/* ---------- FAQ ---------- */
+function faqForm(f,i){
+  return `<div class="editor-card" data-faq>
+    <div class="row-head"><span class="idx">Q ${i+1}</span><button class="btn-danger" onclick="this.closest('[data-faq]').remove()">Remove</button></div>
+    <div class="field"><label>Question</label><input class="input" data-f="q" value="${esc(f.q)}"></div>
+    <div class="field"><label>Answer</label><textarea class="textarea" data-f="a" style="min-height:80px">${esc(f.a)}</textarea></div>
+  </div>`;
+}
+function renderFaq(){ $('#faqList').innerHTML = (DATA.faq||[]).map(faqForm).join('') || '<p class="muted">No questions yet.</p>'; }
+function addFaq(){ DATA.faq=collectFaq(); DATA.faq.push({q:'New question?',a:''}); renderFaq(); }
+function collectFaq(){
+  return Array.from(document.querySelectorAll('#faqList [data-faq]')).map(c=>{
+    const g=f=>{const e=c.querySelector(`[data-f="${f}"]`);return e?e.value:'';};
+    return { q:g('q').trim(), a:g('a').trim() };
+  });
+}
+async function saveFaq(){ const items=collectFaq(); await withSave('#saveFaq',()=>saveFile('faq',{items},'Update FAQ (admin)'),'FAQ saved ✓'); DATA.faq=items; }
+
+/* ---------- IMAGE UPLOAD (commits to repo via GitHub API) ---------- */
+async function uploadImage(file){
+  const name = Date.now() + '-' + file.name.replace(/[^a-zA-Z0-9.\-_]/g,'-').toLowerCase();
+  const path = 'assets/img/uploads/' + name;
+  const b64 = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(',')[1]); r.onerror=rej; r.readAsDataURL(file); });
+  const resp = await ghFetch(`/repos/${CONFIG.repo}/contents/${path}`, { method:'PUT', body: JSON.stringify({ message:'Upload '+name+' (admin)', content:b64, branch:CONFIG.branch }) });
+  if(!resp.ok){ const e=await resp.json().catch(()=>({})); throw new Error(e.message||'upload failed'); }
+  return path;
+}
+function pickImage(btn){
+  const inp = btn.parentElement.querySelector('[data-f="image"]');
+  const f = document.createElement('input'); f.type='file'; f.accept='image/*';
+  f.onchange = async ()=>{ if(!f.files[0]) return; const lbl=btn.textContent; btn.disabled=true; btn.textContent='…'; try{ inp.value = await uploadImage(f.files[0]); toast('Image uploaded ✓','ok'); }catch(e){ toast('Upload failed: '+e.message,'err'); } finally{ btn.disabled=false; btn.textContent=lbl; } };
+  f.click();
+}
+async function doMediaUpload(){
+  const f = $('#mediaFile'); if(!f.files || !f.files[0]){ toast('Pick an image first.','err'); return; }
+  const btn=$('#mediaBtn'); btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Uploading…';
+  try{
+    const path = await uploadImage(f.files[0]);
+    $('#mediaResult').innerHTML = `<div class="editor-card">Uploaded ✓<br><code style="word-break:break-all">${path}</code><br><button class="btn btn-ghost btn-sm" style="margin-top:.6rem" onclick="navigator.clipboard.writeText('${path}').then(()=>toast('Path copied','ok'))">Copy path</button> <a class="btn btn-ghost btn-sm" style="margin-top:.6rem" href="../${path}" target="_blank">Open</a></div>`;
+    toast('Uploaded ✓','ok');
+  }catch(e){ toast('Upload failed: '+e.message,'err'); }
+  finally{ btn.disabled=false; btn.textContent='Upload'; }
 }
 
 /* ---------- auto-login ---------- */

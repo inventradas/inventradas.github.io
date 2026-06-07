@@ -7,5 +7,17 @@
   "response_time": "Within 24 hours",
   "linkedin": "#",
   "github": "#",
-  "x": "#"
+  "x": "#",
+  "hero_badge": "Engineering partner for industry 4.0",
+  "hero_title_before": "We design, automate &",
+  "hero_title_accent": "engineer",
+  "hero_title_after": "the systems that move industry.",
+  "hero_lead": "From a napkin sketch to a deployed production line — INVENTRA delivers reliable hardware, firmware and automation engineering, end to end. Precision-built, future-ready, fully supported.",
+  "hero_typewriter": ["Industrial Automation & PLC/HMI", "Embedded Systems & Firmware", "IoT & Connected Devices", "Control Systems & SCADA", "Product Design & Prototyping"],
+  "stats": [
+    { "value": "8", "suffix": "+", "label": "Years engineering" },
+    { "value": "120", "suffix": "+", "label": "Projects delivered" },
+    { "value": "40", "suffix": "+", "label": "Clients worldwide" },
+    { "value": "99.9", "suffix": "%", "label": "Uptime achieved" }
+  ]
 }

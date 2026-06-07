@@ -1,0 +1,40 @@
+{
+  "items": [
+    {
+      "icon": "gear",
+      "title": "Industrial Automation & PLC/HMI",
+      "description": "PLC programming, HMI/SCADA, line control and process optimisation built on B&R, Siemens and Codesys platforms.",
+      "features": ["B&R, Siemens & Codesys PLC programming", "HMI / panel design & UX", "Retrofits, line integration & commissioning"]
+    },
+    {
+      "icon": "chip",
+      "title": "Embedded Systems & Firmware",
+      "description": "Bare-metal & RTOS firmware for ESP32, STM32 and custom boards — sensors, motor control and low-power operation.",
+      "features": ["Bare-metal & RTOS firmware (C/C++/Rust)", "Sensors, motor control & power management", "Diagnostics, calibration & field reliability"]
+    },
+    {
+      "icon": "broadcast",
+      "title": "IoT & Connectivity",
+      "description": "Connected devices, gateways and cloud dashboards — MQTT, OPC UA and secure telemetry with real-time monitoring.",
+      "features": ["MQTT, OPC UA & edge gateways", "Real-time dashboards (Grafana / custom)", "Time-series storage & alerting"]
+    },
+    {
+      "icon": "sliders",
+      "title": "Control Systems & SCADA",
+      "description": "Closed-loop control, motion & drives, data acquisition and plant-wide SCADA with alarms and historian.",
+      "features": ["PID / model-based control & tuning", "Motion & multi-axis drives", "SCADA, alarms & historian"]
+    },
+    {
+      "icon": "cube",
+      "title": "Mechanical Design & Prototyping",
+      "description": "SolidWorks 3D CAD, mechanical design, enclosures, rapid prototyping and DFM — turning concepts into manufacturable products.",
+      "features": ["SolidWorks 3D CAD & mechanical design", "Enclosure / CAD & 3D-printed prototypes", "DFM, BOM optimisation & pilot runs"]
+    },
+    {
+      "icon": "shield",
+      "title": "Consulting & Training",
+      "description": "Technical due diligence, system architecture, audits and hands-on team training to de-risk your roadmap.",
+      "features": ["System architecture & technology selection", "Code / design audits & due diligence", "Workshops & team upskilling"]
+    }
+  ]
+}
