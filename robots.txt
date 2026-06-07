@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://saadkhanbmte00.github.io/inventrasolutions/sitemap.xml
+Sitemap: https://inventradas.github.io/sitemap.xml
