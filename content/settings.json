@@ -1,6 +1,6 @@
 {
   "company": "INVENTRA Design & Automation Solutions",
-  "email": "hello@inventra.dev",
+  "email": "inventradas@gmail.com",
   "phone": "+1 (000) 000-0000",
   "phone_href": "+10000000000",
   "location": "Remote-first · Worldwide",
@@ -13,11 +13,33 @@
   "hero_title_accent": "engineer",
   "hero_title_after": "the systems that move industry.",
   "hero_lead": "From a napkin sketch to a deployed production line — INVENTRA delivers reliable hardware, firmware and automation engineering, end to end. Precision-built, future-ready, fully supported.",
-  "hero_typewriter": ["Industrial Automation & PLC/HMI", "Embedded Systems & Firmware", "IoT & Connected Devices", "Control Systems & SCADA", "Product Design & Prototyping"],
+  "hero_typewriter": [
+    "Industrial Automation & PLC/HMI",
+    "Embedded Systems & Firmware",
+    "IoT & Connected Devices",
+    "Control Systems & SCADA",
+    "Product Design & Prototyping"
+  ],
   "stats": [
-    { "value": "8", "suffix": "+", "label": "Years engineering" },
-    { "value": "120", "suffix": "+", "label": "Projects delivered" },
-    { "value": "40", "suffix": "+", "label": "Clients worldwide" },
-    { "value": "99.9", "suffix": "%", "label": "Uptime achieved" }
+    {
+      "value": "8",
+      "suffix": "+",
+      "label": "Years engineering"
+    },
+    {
+      "value": "120",
+      "suffix": "+",
+      "label": "Projects delivered"
+    },
+    {
+      "value": "40",
+      "suffix": "+",
+      "label": "Clients worldwide"
+    },
+    {
+      "value": "99.9",
+      "suffix": "%",
+      "label": "Uptime achieved"
+    }
   ]
 }
